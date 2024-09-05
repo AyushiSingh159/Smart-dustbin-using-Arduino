@@ -1,0 +1,62 @@
+#include <Servo.h> // servo library  
+#define BLYNK_TEMPLATE_ID "TMPL3J08rAmJm"
+#define BLYNK_TEMPLATE_NAME "switch"
+#define BLYNK_AUTH_TOKEN "EYGzNqiX5zLpA4YOeLlJJSE4Bbtncdqv" 
+#define BLYNK_PRINT Serial
+#include <ESP8266WiFi.h>
+#include <WiFiClient.h>
+#include <BlynkSimpleEsp8266.h>
+
+ Servo s1; 
+const int trigPin = D5; 
+const int echoPin = D6; 
+char ssid[] = "Tanya";
+char pass[] = "Tannu2307";
+
+long duration;
+int distance;  
+
+ void setup()  
+ {   
+  s1.attach(0);  // servo attach D3 pin of arduino 
+  pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
+  pinMode(echoPin, INPUT); // Sets the echoPin as an Input
+  Serial.begin(9600); // Starts the serial communication
+  Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
+} 
+ void loop()   
+ { 
+  // Sets the trigPin on HIGH state for 10 micro seconds
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  // Reads the echoPin, returns the sound wave travel time in microseconds
+  duration = pulseIn(echoPin, HIGH);
+
+  // Calculating the distance
+  distance= duration*0.034/2;
+  // Prints the distance on the Serial Monitor
+  Serial.print("Distance: ");
+  Serial.println(distance);
+  delay(200); 
+  if(distance<15)
+  {   
+    s1.write(180);  // open the dustbin
+    delay(2000);  
+  }
+  s1.write(0); //close the dustbin
+  Blynk.run();
+}
+BLYNK_WRITE(V1)
+{
+  int pinValue = param.asInt(); // assigning incoming value from pin V1 to a variable
+  if(pinValue==1)
+  {
+    s1.write(180);
+    delay(2000);
+  }
+  else
+    s1.write(0);
+  // process received value
+}
